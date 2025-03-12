@@ -28,21 +28,164 @@ const DayPlanner2 = () => {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(
-      `http://localhost:5001/api/events?userId=${userId}&date=${formattedSelectedDate}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const sortedEvents = [...data].sort((a, b) => {
-          const priorityOrder = { high: 1, medium: 2, low: 3 };
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
+    // Fetch both events and schedule chapter first
+    Promise.all([
+      fetch(
+        `http://localhost:5001/api/events?userId=${userId}&date=${formattedSelectedDate}`
+      ).then((res) => res.json()),
+      fetch(`http://localhost:5001/api/schedule/chapter?userId=${userId}`).then(
+        (res) => res.json()
+      ),
+    ])
+      .then(([eventsData, scheduleData]) => {
+        console.log("Raw Events Data:", eventsData);
+        console.log("Raw Schedule Data:", scheduleData);
+
+        const todayDate = formattedSelectedDate;
+
+        // Process scheduleData into events format
+        const scheduleEvents = scheduleData.flatMap((plan) =>
+          plan.subtopics
+            .filter((subtopic) => subtopic.date === todayDate)
+            .map((subtopic) => ({
+              title: plan.chapter,
+              content: `${subtopic.name} - ${plan.subject}`,
+              duration: "1",
+              priority: subtopic.difficulty,
+              time: subtopic.time,
+            }))
+        );
+
+        // Merge all events
+        let mergedEvents = [...eventsData, ...scheduleEvents];
+
+        // Step 1: Sort by priority and then by title lexicographically
+        const priorityOrder = { high: 1, medium: 2, low: 3 };
+        mergedEvents.sort((a, b) => {
+          if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+          }
+          return a.title.localeCompare(b.title);
         });
-        setEvents(sortedEvents);
+
+        // Step 2: Adjust time slots to avoid conflicts
+        const scheduledEvents = [];
+        let lastScheduledTime = "07:00";
+        const occupiedSlots = new Set();
+
+        for (const event of mergedEvents) {
+          let [hours, minutes] = lastScheduledTime.split(":").map(Number);
+
+          // If time is already occupied, find the next available slot
+          while (
+            occupiedSlots.has(
+              `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+                2,
+                "0"
+              )}`
+            )
+          ) {
+            hours += 1;
+          }
+
+          // Assign new time
+          const newTime = `${String(hours).padStart(2, "0")}:${String(
+            minutes
+          ).padStart(2, "0")}`;
+          occupiedSlots.add(newTime);
+          scheduledEvents.push({ ...event, time: newTime });
+
+          // Update last scheduled time
+          lastScheduledTime = newTime;
+        }
+
+        console.log("Final Scheduled Events:", scheduledEvents);
+        setEvents(scheduledEvents);
       })
       .catch((error) => console.error("Error fetching events:", error));
   }, [formattedSelectedDate, userId]);
 
-  console.log("Selected Date:", formattedSelectedDate);
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(
+  //     `http://localhost:5001/api/events?userId=${userId}&date=${formattedSelectedDate}`
+  //   )
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setEvents((prevEvents) => {
+  //         const mergedEvents = [...prevEvents, ...data]; // Merge old + new events
+  //         return mergedEvents.sort((a, b) => {
+  //           const priorityOrder = { high: 1, medium: 2, low: 3 };
+  //           if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+  //             return priorityOrder[a.priority] - priorityOrder[b.priority];
+  //           }
+  //           return a.title.localeCompare(b.title); // Sort lexicographically
+  //         });
+  //       });
+  //     })
+  //     .catch((error) => console.error("Error fetching events:", error));
+  // }, [formattedSelectedDate, userId]);
+
+  // useEffect(() => {
+  //   if (!userId) return;
+
+  //   fetch(`http://localhost:5001/api/schedule/chapter?userId=${userId}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("Full Data:", data);
+
+  //       const todayDate = formattedSelectedDate;
+
+  //       // Extract and format events
+  //       const todaysEvents = data.flatMap((plan) =>
+  //         plan.subtopics
+  //           .filter((subtopic) => subtopic.date === todayDate)
+  //           .map((subtopic) => ({
+  //             title: plan.chapter,
+  //             content: `${subtopic.name} - ${plan.subject}`,
+  //             duration: "1",
+  //             priority: subtopic.difficulty,
+  //             time: subtopic.time,
+  //           }))
+  //       );
+
+  //       setEvents((prevEvents) => {
+  //         const mergedEvents = [...prevEvents, ...todaysEvents]; // Merge old + new events
+  //         return mergedEvents.sort((a, b) => {
+  //           const priorityOrder = { high: 1, medium: 2, low: 3 };
+  //           if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+  //             return priorityOrder[a.priority] - priorityOrder[b.priority];
+  //           }
+  //           return a.title.localeCompare(b.title);
+  //         });
+  //       });
+
+  //       console.log("Today's Events:", todaysEvents);
+  //     })
+  //     .catch((error) => console.error("Error fetching events:", error));
+  // }, [formattedSelectedDate, userId]);
+
+  // useEffect(() => {
+  //   setEvents((prevEvents) => {
+  //     let lastScheduledTime = "07:00";
+  //     const timeIncrement = 1; // Increase by 1 hour
+
+  //     const scheduledEvents = prevEvents.map((event, index, arr) => {
+  //       if (index > 0 && event.time === arr[index - 1].time) {
+  //         let [hours, minutes] = lastScheduledTime.split(":").map(Number);
+  //         hours += timeIncrement;
+  //         lastScheduledTime = `${String(hours).padStart(2, "0")}:${String(
+  //           minutes
+  //         ).padStart(2, "0")}`;
+  //       }
+  //       return { ...event, time: lastScheduledTime }; // Return new object (no mutation)
+  //     });
+
+  //     console.log("Final Scheduled Events:", scheduledEvents);
+  //     return scheduledEvents;
+  //   });
+  // }, [formattedSelectedDate]); // Trigger only on date change
 
   // Assign available time slots (7:00 to 23:00)
   const scheduledEvents = {};
@@ -59,8 +202,8 @@ const DayPlanner2 = () => {
   };
 
   events.forEach((event) => {
-    let eventHour = parseInt(event.time.split(":")[0]);
-    console.log(eventHour);
+    let eventHour = parseInt(event?.time?.split(":")[0]);
+    // console.log(eventHour);d
 
     if (eventHour >= 7) {
       scheduledEvents[`${eventHour}:00`] = event; // Ensure key format matches rendering loop

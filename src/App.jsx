@@ -7,6 +7,7 @@ import HeroPage from "./components/HeroPage";
 import DayPlanner2 from "./components/DayPlanner";
 import Dashboard from "./components/Dashboard";
 import YearPlanner from "./components/calender";
+import StudyPage from "./components/StudyPage";
 
 const router = createBrowserRouter([
   {
@@ -68,7 +69,10 @@ const router = createBrowserRouter([
     element: (
       <div className="w-full h-full flex flex-col">
         <Navbar />
-        <Dashboard />
+        <div className="flex flex-row gap-3 bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white">
+          <Dashboard />
+          <StudyPage />
+        </div>
       </div>
     ),
   },

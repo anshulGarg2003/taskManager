@@ -16,10 +16,6 @@ const Dashboard = () => {
     }
   }, [isAuthenticated, navigate, user]);
 
-  useEffect(() => {
-    console.log(userData, "Namaste");
-  }, [userData]);
-
   if (isLoading)
     return (
       <div className="flex h-screen items-center justify-center text-white text-xl">
@@ -28,7 +24,7 @@ const Dashboard = () => {
     );
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white">
+    <div className="h-screen flex items-center justify-center ml-5 ">
       {/* Main Dashboard Card */}
       <motion.div
         className="bg-white bg-opacity-10 backdrop-blur-lg shadow-xl p-8 rounded-2xl text-center max-w-lg w-full border border-white border-opacity-20"

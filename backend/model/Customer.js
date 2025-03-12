@@ -28,7 +28,6 @@ const userSchema = new mongoose.Schema({
   // Study Resources
   follows_ncert: { type: Boolean, default: true },
   study_materials: [{ type: String }], // Coaching, YouTube, etc.
-  prefers_video_lectures: { type: Boolean, default: false },
   mock_test_frequency: {
     type: String,
     enum: ["Weekly", "Bi-weekly", "Monthly"],

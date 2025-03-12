@@ -7,11 +7,12 @@ import cron from "node-cron";
 import moment from "moment";
 import eventRoute from "./api/eventRoute.js";
 import userRoute from "./api/userRoute.js";
+import chapterRoute from "./api/chapterRoute.js";
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "http://localhost:5174/" }, // Allow React frontend
+  cors: { origin: "http://localhost:5173/" }, // Allow React frontend
 });
 
 // Middleware
@@ -29,6 +30,7 @@ mongoose.connect(
 
 app.use("/api", eventRoute);
 app.use("/api/users", userRoute);
+app.use("/api/schedule", chapterRoute);
 
 // Start Notification Cron Job
 cron.schedule("* * * * *", async () => {
