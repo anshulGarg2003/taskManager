@@ -3,9 +3,10 @@ import Math from "../data/Math";
 import Physics from "../data/Physics";
 import PhysicalChem from "../data/PhysicalChem";
 import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import toast from "react-hot-toast";
+import { BASIC_URL } from "../utlis/API_calls";
 
 const subjects = {
   Mathematics: Math,
@@ -17,14 +18,16 @@ export default function Subjects() {
   const [subject, setSubject] = useState(null);
   const [chapter, setChapter] = useState(null);
 
-  const [userId, setUserId] = useState(null);
-  const { user } = useAuth0();
-
-  useEffect(() => {
-    setUserId(user.sub);
-  }, [user]);
+  const { isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
+  console.log(userInfo);
 
   const handleChapterSchedule = async () => {
+    if (!isAuthenticated) return toast.error("Please Login First");
+    // if (!userInfo.isPaid)
+    //   return toast.error(
+    //     "You have to purchase our premium servies to avail this feature"
+    //   );
     if (!chapter || !chapter.topics) return toast.error("No chapter selected!");
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + 1); // Start scheduling from tomorrow
@@ -47,7 +50,7 @@ export default function Subjects() {
     });
 
     const studyPlan = {
-      userId,
+      userId: userInfo.id,
       subject,
       chapter: chapter.chapter,
       subtopics,
@@ -55,16 +58,13 @@ export default function Subjects() {
 
     console.log(studyPlan);
     try {
-      const response = await fetch(
-        "http://localhost:5001/api/schedule/chapter",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(studyPlan),
-        }
-      );
+      const response = await fetch(`${BASIC_URL}/api/schedule/chapter`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(studyPlan),
+      });
 
       const result = await response.json();
       if (response.ok) {

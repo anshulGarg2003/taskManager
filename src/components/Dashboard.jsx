@@ -2,19 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-  const { user, isAuthenticated, isLoading, logout } = useAuth0();
+  const { isAuthenticated, isLoading, logout } = useAuth0();
   const [userData, setUserData] = useState(null);
+  const userInfo = useSelector((state) => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/");
     } else {
-      setUserData(user);
+      setUserData(userInfo);
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, navigate, userInfo]);
 
   if (isLoading)
     return (

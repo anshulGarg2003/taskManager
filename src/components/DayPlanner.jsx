@@ -3,12 +3,15 @@ import { motion } from "framer-motion";
 import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useSelector } from "react-redux";
+import { BASIC_URL } from "../utlis/API_calls";
 
 // const socket = io("http://localhost:5001");
 
 const DayPlanner2 = () => {
   const [events, setEvents] = useState([]);
-  const user = useAuth0().user;
+  const { isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
 
   const location = useLocation();
   const selectedDate = location.state?.date || new Date();
@@ -17,7 +20,7 @@ const DayPlanner2 = () => {
     .toISOString()
     .split("T")[0];
 
-  const userId = user?.sub || "";
+  const userId = isAuthenticated ? userInfo.id : "";
 
   const priorityColors = {
     high: "bg-red-500 text-white",
@@ -31,15 +34,15 @@ const DayPlanner2 = () => {
     // Fetch both events and schedule chapter first
     Promise.all([
       fetch(
-        `http://localhost:5001/api/events?userId=${userId}&date=${formattedSelectedDate}`
+        `${BASIC_URL}/api/events?userId=${userId}&date=${formattedSelectedDate}`
       ).then((res) => res.json()),
-      fetch(`http://localhost:5001/api/schedule/chapter?userId=${userId}`).then(
+      fetch(`${BASIC_URL}/api/schedule/chapter?userId=${userId}`).then(
         (res) => res.json()
       ),
     ])
       .then(([eventsData, scheduleData]) => {
-        console.log("Raw Events Data:", eventsData);
-        console.log("Raw Schedule Data:", scheduleData);
+        // console.log("Raw Events Data:", eventsData);
+        // console.log("Raw Schedule Data:", scheduleData);
 
         const todayDate = formattedSelectedDate;
 
@@ -99,93 +102,11 @@ const DayPlanner2 = () => {
           lastScheduledTime = newTime;
         }
 
-        console.log("Final Scheduled Events:", scheduledEvents);
+        // console.log("Final Scheduled Events:", scheduledEvents);
         setEvents(scheduledEvents);
       })
       .catch((error) => console.error("Error fetching events:", error));
   }, [formattedSelectedDate, userId]);
-
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(
-  //     `http://localhost:5001/api/events?userId=${userId}&date=${formattedSelectedDate}`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setEvents((prevEvents) => {
-  //         const mergedEvents = [...prevEvents, ...data]; // Merge old + new events
-  //         return mergedEvents.sort((a, b) => {
-  //           const priorityOrder = { high: 1, medium: 2, low: 3 };
-  //           if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-  //             return priorityOrder[a.priority] - priorityOrder[b.priority];
-  //           }
-  //           return a.title.localeCompare(b.title); // Sort lexicographically
-  //         });
-  //       });
-  //     })
-  //     .catch((error) => console.error("Error fetching events:", error));
-  // }, [formattedSelectedDate, userId]);
-
-  // useEffect(() => {
-  //   if (!userId) return;
-
-  //   fetch(`http://localhost:5001/api/schedule/chapter?userId=${userId}`)
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log("Full Data:", data);
-
-  //       const todayDate = formattedSelectedDate;
-
-  //       // Extract and format events
-  //       const todaysEvents = data.flatMap((plan) =>
-  //         plan.subtopics
-  //           .filter((subtopic) => subtopic.date === todayDate)
-  //           .map((subtopic) => ({
-  //             title: plan.chapter,
-  //             content: `${subtopic.name} - ${plan.subject}`,
-  //             duration: "1",
-  //             priority: subtopic.difficulty,
-  //             time: subtopic.time,
-  //           }))
-  //       );
-
-  //       setEvents((prevEvents) => {
-  //         const mergedEvents = [...prevEvents, ...todaysEvents]; // Merge old + new events
-  //         return mergedEvents.sort((a, b) => {
-  //           const priorityOrder = { high: 1, medium: 2, low: 3 };
-  //           if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-  //             return priorityOrder[a.priority] - priorityOrder[b.priority];
-  //           }
-  //           return a.title.localeCompare(b.title);
-  //         });
-  //       });
-
-  //       console.log("Today's Events:", todaysEvents);
-  //     })
-  //     .catch((error) => console.error("Error fetching events:", error));
-  // }, [formattedSelectedDate, userId]);
-
-  // useEffect(() => {
-  //   setEvents((prevEvents) => {
-  //     let lastScheduledTime = "07:00";
-  //     const timeIncrement = 1; // Increase by 1 hour
-
-  //     const scheduledEvents = prevEvents.map((event, index, arr) => {
-  //       if (index > 0 && event.time === arr[index - 1].time) {
-  //         let [hours, minutes] = lastScheduledTime.split(":").map(Number);
-  //         hours += timeIncrement;
-  //         lastScheduledTime = `${String(hours).padStart(2, "0")}:${String(
-  //           minutes
-  //         ).padStart(2, "0")}`;
-  //       }
-  //       return { ...event, time: lastScheduledTime }; // Return new object (no mutation)
-  //     });
-
-  //     console.log("Final Scheduled Events:", scheduledEvents);
-  //     return scheduledEvents;
-  //   });
-  // }, [formattedSelectedDate]); // Trigger only on date change
 
   // Assign available time slots (7:00 to 23:00)
   const scheduledEvents = {};

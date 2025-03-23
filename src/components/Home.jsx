@@ -1,7 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { BASIC_URL } from "../utlis/API_calls";
 
 const Home = () => {
   const [title, setTitle] = useState("");
@@ -13,11 +15,12 @@ const Home = () => {
   const [always, setAlways] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const pasteId = searchParams.get("pasteId");
-  const { user } = useAuth0();
+  const { isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
 
   useEffect(() => {
     if (pasteId) {
-      fetch(`http://localhost:5001/api/events/${pasteId}`)
+      fetch(`${BASIC_URL}/api/events/${pasteId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data) {
@@ -35,7 +38,7 @@ const Home = () => {
   }, [pasteId]);
 
   const handleSave = async () => {
-    if (!user) {
+    if (!userInfo) {
       toast.error("Please log in to save your event.");
       return;
     }
@@ -52,35 +55,38 @@ const Home = () => {
       time: `${time}:00`,
       duration: Number(duration),
       date: always ? "always" : date,
-      userId: user.sub,
+      userId: isAuthenticated ? userInfo.id : "",
     };
 
     try {
       let response;
       let savedEvent;
       if (pasteId) {
-        response = await fetch(`http://localhost:5001/api/events/${pasteId}`, {
+        response = await fetch(`${BASIC_URL}/api/events/${pasteId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(eventData),
         });
       } else {
-        response = await fetch("http://localhost:5001/api/add-event", {
+        response = await fetch(`${BASIC_URL}/api/add-event`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(eventData),
         });
         savedEvent = await response.json();
-      }
+      }   
 
       if (response.ok) {
         toast.success(pasteId ? "Event updated!" : "Event added!");
         if (!pasteId) {
-          await fetch(`http://localhost:5001/api/users/${user.sub}/addTask`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ taskId: savedEvent._id }),
-          });
+          await fetch(
+            `${BASIC_URL}/api/users/${userInfo.id}/addTask`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ taskId: savedEvent._id }),
+            }
+          );
         }
         resetForm();
       } else {

@@ -2,14 +2,19 @@ import React, { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserInfo } from "../redux/userSlice";
+import { BASIC_URL } from "../utlis/API_calls";
 
 const HeroPage = () => {
   const { user, loginWithRedirect, logout, isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (user) {
-      fetch("http://localhost:5001/api/users/login", {
+      fetch(`${BASIC_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -17,13 +22,21 @@ const HeroPage = () => {
           name: user.name,
           email: user.email,
           picture: user.picture,
+          isPaid: false,
         }),
       })
-        .then((res) => res.json())
-        .then(() => navigate("/dashboard")) // Redirect after login
+        .then((res) => res.json()) // ✅ Parse JSON response
+        .then((data) => {
+          console.log(data);
+          dispatch(setUserInfo(data));
+
+          navigate("/dashboard"); // Redirect after storing data
+        })
         .catch((error) => console.error("Error storing user:", error));
     }
-  }, [user, navigate]);
+  }, [user, userInfo, dispatch, navigate]);
+
+  console.log(userInfo);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white">

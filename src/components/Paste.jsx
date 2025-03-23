@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FormatDate } from "../utlis/formatDate";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useSelector } from "react-redux";
+import { BASIC_URL } from "../utlis/API_calls";
 
 const Paste = () => {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { user, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
   const [userData, setUserData] = useState(null);
   const [nextEvent, setNextEvent] = useState(null); // Holds the nearest event
+  const userInfo = useSelector((state) => state.user);
   const formattedTime =
     nextEvent?.time && nextEvent.time.includes(":") // Check if time is valid
       ? (() => {
@@ -22,16 +25,16 @@ const Paste = () => {
       : "Time Not Available"; // Default fallback
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserData(user);
+    if (isAuthenticated) {
+      setUserData(userInfo);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, userInfo]);
 
   useEffect(() => {
     if (!userData) return;
 
     const userId = userData.sub;
-    fetch(`http://localhost:5001/api/events?userId=${userId}`)
+    fetch(`${BASIC_URL}/api/events?userId=${userId}`)
       .then((res) => res.json())
       .then((data) => {
         setEvents(data);
@@ -91,7 +94,7 @@ const Paste = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/events/${id}`, {
+      const response = await fetch(`${BASIC_URL}/api/events/${id}`, {
         method: "DELETE",
       });
 
