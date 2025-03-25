@@ -1,1 +1,1 @@
-export const BASIC_URL = "http://localhost:5001";
+export const BASIC_URL = "https://aimanager-backend.onrender.com";
