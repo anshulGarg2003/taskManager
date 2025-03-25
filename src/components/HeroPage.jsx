@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -11,6 +11,8 @@ const HeroPage = () => {
   const userInfo = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [grade, setGrade] = useState("");
+  const [school, setSchool] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -29,7 +31,6 @@ const HeroPage = () => {
         .then((data) => {
           console.log(data);
           dispatch(setUserInfo(data));
-
           navigate("/dashboard"); // Redirect after storing data
         })
         .catch((error) => console.error("Error storing user:", error));

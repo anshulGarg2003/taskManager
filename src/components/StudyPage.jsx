@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import toast from "react-hot-toast";
 import { BASIC_URL } from "../utlis/API_calls";
+import { setUserEduInfo } from "../redux/userSlice";
 
 const subjects = {
   Mathematics: Math,
@@ -17,17 +18,66 @@ const subjects = {
 export default function Subjects() {
   const [subject, setSubject] = useState(null);
   const [chapter, setChapter] = useState(null);
+  const [school, setSchool] = useState("");
+  const [grade, setGrade] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const dispatch = useDispatch();
 
   const { isAuthenticated } = useAuth0();
   const userInfo = useSelector((state) => state.user);
   console.log(userInfo);
 
+  useEffect(() => {
+    if (!userInfo.school || !userInfo.grade) {
+      setShowForm(true);
+    }
+  }, [userInfo]);
+
+  const handleSaveDetails = async () => {
+    if (!userInfo.id) {
+      return toast.error("Please Login first to add the details");
+    }
+
+    if (!school || !grade) {
+      return toast.error("Please provide both School and Grade!");
+    }
+
+    const userData = {
+      school,
+      grade,
+    };
+
+    try {
+      const response = await fetch(
+        `${BASIC_URL}/api/users/${userInfo.id}/addeduinfo`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        }
+      );
+
+      const result = await response.json();
+      if (response.ok) {
+        dispatch(setUserEduInfo(result)); // Update Redux store
+        toast.success("Education info updated successfully!");
+        setShowForm(false);
+        // navigate("/dashboard"); // Redirect after storing data
+      } else {
+        toast.error("Failed to update: " + result.message);
+      }
+    } catch (error) {
+      console.error("Error updating education info:", error);
+      toast.error("Something went wrong!");
+    }
+  };
+
   const handleChapterSchedule = async () => {
     if (!isAuthenticated) return toast.error("Please Login First");
-    // if (!userInfo.isPaid)
-    //   return toast.error(
-    //     "You have to purchase our premium servies to avail this feature"
-    //   );
+    if (!userInfo.isPaid)
+      return toast.error(
+        "You have to purchase our premium servies to avail this feature"
+      );
     if (!chapter || !chapter.topics) return toast.error("No chapter selected!");
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + 1); // Start scheduling from tomorrow
@@ -86,8 +136,55 @@ export default function Subjects() {
         transition={{ duration: 0.5 }}
         className="bg-white p-6 rounded-2xl shadow-xl max-w-lg w-full"
       >
-        {/* Subject Selection */}
-        {!subject ? (
+        {showForm ? (
+          <div className="p-5 min-h-screen bg-gray-100 flex justify-center items-center w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-white p-6 rounded-2xl shadow-xl max-w-lg w-full text-center"
+            >
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Enter Your School Name
+              </h2>
+              <input
+                type="text"
+                placeholder="School Name"
+                className="w-full p-2 mb-3 border border-gray-300 rounded-lg text-black"
+                value={school}
+                onChange={(e) => setSchool(e.target.value)}
+              />
+
+              {/* Grade Selection */}
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Please select your grade
+              </h2>
+              <div className="flex justify-between gap-4">
+                {["11th", "12th"].map((option) => (
+                  <motion.button
+                    key={option}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`block ${
+                      grade === option ? "bg-indigo-700" : "bg-indigo-500"
+                    } text-white font-medium p-3 rounded-lg shadow-lg hover:bg-indigo-600 w-full transition-all`}
+                    onClick={() => setGrade(option)}
+                  >
+                    {option}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Save Button */}
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md w-full hover:bg-blue-800 mt-4"
+                onClick={handleSaveDetails}
+              >
+                Save & Continue
+              </button>
+            </motion.div>
+          </div>
+        ) : !subject ? (
           <div className="space-y-3 text-center w-full">
             <h2 className="text-2xl font-bold text-gray-800 w-full">
               Select a Subject you want to Study

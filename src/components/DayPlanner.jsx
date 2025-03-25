@@ -36,12 +36,12 @@ const DayPlanner2 = () => {
       fetch(
         `${BASIC_URL}/api/events?userId=${userId}&date=${formattedSelectedDate}`
       ).then((res) => res.json()),
-      fetch(`${BASIC_URL}/api/schedule/chapter?userId=${userId}`).then(
-        (res) => res.json()
+      fetch(`${BASIC_URL}/api/schedule/chapter?userId=${userId}`).then((res) =>
+        res.json()
       ),
     ])
       .then(([eventsData, scheduleData]) => {
-        // console.log("Raw Events Data:", eventsData);
+        console.log("Raw Events Data:", eventsData);
         // console.log("Raw Schedule Data:", scheduleData);
 
         const todayDate = formattedSelectedDate;
@@ -73,7 +73,16 @@ const DayPlanner2 = () => {
 
         // Step 2: Adjust time slots to avoid conflicts
         const scheduledEvents = [];
-        let lastScheduledTime = "07:00";
+        let earliestHour = mergedEvents.reduce((earliest, event) => {
+          let eventHour = parseInt(event.time.split(":")[0]); // Extract the hour part
+          return eventHour < earliest ? eventHour : earliest;
+        }, Infinity);
+
+        // Convert it to HH:00 format
+        let lastScheduledTime = `${String(earliestHour).padStart(2, "0")}:00`;
+
+        console.log(lastScheduledTime);
+
         const occupiedSlots = new Set();
 
         for (const event of mergedEvents) {
@@ -102,7 +111,7 @@ const DayPlanner2 = () => {
           lastScheduledTime = newTime;
         }
 
-        // console.log("Final Scheduled Events:", scheduledEvents);
+        console.log("Final Scheduled Events:", scheduledEvents);
         setEvents(scheduledEvents);
       })
       .catch((error) => console.error("Error fetching events:", error));
