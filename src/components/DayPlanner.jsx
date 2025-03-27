@@ -6,8 +6,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useSelector } from "react-redux";
 import { BASIC_URL } from "../utlis/API_calls";
 
-// const socket = io("http://localhost:5001");
-
 const DayPlanner2 = () => {
   const [events, setEvents] = useState([]);
   const { isAuthenticated } = useAuth0();
@@ -47,17 +45,21 @@ const DayPlanner2 = () => {
         const todayDate = formattedSelectedDate;
 
         // Process scheduleData into events format
-        const scheduleEvents = scheduleData.flatMap((plan) =>
-          plan.subtopics
-            .filter((subtopic) => subtopic.date === todayDate)
-            .map((subtopic) => ({
-              title: plan.chapter,
-              content: `${subtopic.name} - ${plan.subject}`,
-              duration: "1",
-              priority: subtopic.difficulty,
-              time: subtopic.time,
-            }))
-        );
+        let scheduleEvents = [];
+
+        if (scheduleData.length > 0) {
+          scheduleEvents = scheduleData.flatMap((plan) =>
+            plan.subtopics
+              .filter((subtopic) => subtopic.date === todayDate)
+              .map((subtopic) => ({
+                title: plan.chapter,
+                content: `${subtopic.name} - ${plan.subject}`,
+                duration: "1",
+                priority: subtopic.difficulty,
+                time: subtopic.time,
+              }))
+          );
+        }
 
         // Merge all events
         let mergedEvents = [...eventsData, ...scheduleEvents];

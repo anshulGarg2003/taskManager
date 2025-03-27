@@ -69,9 +69,9 @@ const router = createBrowserRouter([
     element: (
       <div className="w-full h-full flex flex-col">
         <Navbar />
-        <div className="flex flex-row gap-3 bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white">
-          <Dashboard />
-          <StudyPage />
+        <div className="flex flex-col md:flex-row gap-3 bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white">
+          <Dashboard className="w-full md:w-1/4" />
+          <StudyPage className="w-full md:w-3/4" />
         </div>
       </div>
     ),
