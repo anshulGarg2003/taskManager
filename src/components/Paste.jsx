@@ -12,7 +12,7 @@ const Paste = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [nextEvent, setNextEvent] = useState(null); // Holds the nearest event
   const userInfo = useSelector((state) => state.user);
-  const { isAuthenticated } = useAuth0(D);
+  const { isAuthenticated } = useAuth0();
   const formattedTime =
     nextEvent?.time && nextEvent.time.includes(":") // Check if time is valid
       ? (() => {
