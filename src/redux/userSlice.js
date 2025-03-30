@@ -14,7 +14,6 @@ const userSlice = createSlice({
   },
   reducers: {
     setUserInfo: (state, action) => {
-<<<<<<< HEAD
       const {
         auth0Id,
         _id,
@@ -26,10 +25,6 @@ const userSlice = createSlice({
         grade,
         role,
       } = action.payload;
-=======
-      const { auth0Id, _id, email, isPaid, name, picture, school, grade } =
-        action.payload;
->>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
       state.auth0Id = auth0Id;
       state.id = _id;
       state.isPaid = isPaid;
@@ -38,10 +33,7 @@ const userSlice = createSlice({
       state.picture = picture;
       state.school = school;
       state.grade = grade;
-<<<<<<< HEAD
       state.role = role;
-=======
->>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
     },
     setUserEduInfo: (state, action) => {
       const { school, grade } = action.payload;
