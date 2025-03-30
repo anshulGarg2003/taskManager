@@ -10,10 +10,9 @@ import { BASIC_URL } from "../utlis/API_calls";
 const Paste = () => {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { isAuthenticated } = useAuth0();
-  const [userData, setUserData] = useState(null);
   const [nextEvent, setNextEvent] = useState(null); // Holds the nearest event
   const userInfo = useSelector((state) => state.user);
+  const { isAuthenticated } = useAuth0(D);
   const formattedTime =
     nextEvent?.time && nextEvent.time.includes(":") // Check if time is valid
       ? (() => {
@@ -25,23 +24,18 @@ const Paste = () => {
       : "Time Not Available"; // Default fallback
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setUserData(userInfo);
-    }
-  }, [isAuthenticated, userInfo]);
+    const userId = isAuthenticated ? userInfo.id : "";
+    if (userId == "") return toast.error("Login to ");
 
-  useEffect(() => {
-    if (!userData) return;
-
-    const userId = userData.sub;
     fetch(`${BASIC_URL}/api/events?userId=${userId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setEvents(data);
         findNextEvent(data); // Find the upcoming event
       })
       .catch((error) => console.error("Error fetching events:", error));
-  }, [userData]);
+  }, []);
 
   const findNextEvent = (events) => {
     const now = new Date();
@@ -112,7 +106,7 @@ const Paste = () => {
     }
   };
 
-  const filteredPastes = events.filter((paste) =>
+  const filteredPastes = events?.filter((paste) =>
     paste.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

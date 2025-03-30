@@ -11,12 +11,23 @@ const DayPlanner2 = () => {
   const { isAuthenticated } = useAuth0();
   const userInfo = useSelector((state) => state.user);
 
-  const location = useLocation();
-  const selectedDate = location.state?.date || new Date();
+  const selectedDate = new Date();
+  console.log(selectedDate);
 
   const formattedSelectedDate = new Date(selectedDate)
     .toISOString()
     .split("T")[0];
+
+  function parseTime(timeStr) {
+    let [hours, minutes] = timeStr.split(":").map(Number);
+    return hours * 60 + minutes; // Convert to minutes
+  }
+
+  function formatTime(minutes) {
+    let hours = Math.floor(minutes / 60);
+    let mins = minutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  }
 
   const userId = isAuthenticated ? userInfo.id : "";
 
@@ -40,6 +51,7 @@ const DayPlanner2 = () => {
     ])
       .then(([eventsData, scheduleData]) => {
         console.log("Raw Events Data:", eventsData);
+        console.log("Raw Chapter Data:", scheduleData);
         // console.log("Raw Schedule Data:", scheduleData);
 
         const todayDate = formattedSelectedDate;
@@ -74,47 +86,66 @@ const DayPlanner2 = () => {
         });
 
         // Step 2: Adjust time slots to avoid conflicts
-        const scheduledEvents = [];
-        let earliestHour = mergedEvents.reduce((earliest, event) => {
-          let eventHour = parseInt(event.time.split(":")[0]); // Extract the hour part
-          return eventHour < earliest ? eventHour : earliest;
-        }, Infinity);
+        // const scheduledEvents = [];
+        // let earliestHour = mergedEvents.reduce((earliest, event) => {
+        //   let eventHour = parseInt(event.time.split(":")[0]); // Extract the hour part
+        //   return eventHour < earliest ? eventHour : earliest;
+        // }, Infinity);
 
-        // Convert it to HH:00 format
-        let lastScheduledTime = `${String(earliestHour).padStart(2, "0")}:00`;
+        // // Convert it to HH:00 format
+        // let lastScheduledTime = `${String(earliestHour).padStart(2, "0")}:00`;
 
-        console.log(lastScheduledTime);
+        // console.log(lastScheduledTime);
 
-        const occupiedSlots = new Set();
+        // const occupiedSlots = new Set();
 
-        for (const event of mergedEvents) {
-          let [hours, minutes] = lastScheduledTime.split(":").map(Number);
+        // for (const event of mergedEvents) {
+        //   let [hours, minutes] = lastScheduledTime.split(":").map(Number);
 
-          // If time is already occupied, find the next available slot
-          while (
-            occupiedSlots.has(
-              `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-                2,
-                "0"
-              )}`
-            )
-          ) {
-            hours += 1;
+        //   // If time is already occupied, find the next available slot
+        //   while (
+        //     occupiedSlots.has(
+        //       `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+        //         2,
+        //         "0"
+        //       )}`
+        //     )
+        //   ) {
+        //     hours += 1;
+        //   }
+
+        //   // Assign new time
+        //   const newTime = `${String(hours).padStart(2, "0")}:${String(
+        //     minutes
+        //   ).padStart(2, "0")}`;
+        //   occupiedSlots.add(newTime);
+        //   scheduledEvents.push({ ...event, time: newTime });
+
+        //   // Update last scheduled time
+        //   lastScheduledTime = newTime;
+        // }
+
+        let scheduled = [];
+        let occupiedTimes = new Set();
+
+        for (let event of mergedEvents) {
+          let scheduledTime = parseTime(event.time);
+
+          // If the time is occupied, extend by 1 hour
+          while (occupiedTimes.has(scheduledTime)) {
+            scheduledTime += 60;
           }
 
-          // Assign new time
-          const newTime = `${String(hours).padStart(2, "0")}:${String(
-            minutes
-          ).padStart(2, "0")}`;
-          occupiedSlots.add(newTime);
-          scheduledEvents.push({ ...event, time: newTime });
-
-          // Update last scheduled time
-          lastScheduledTime = newTime;
+          // Schedule the event
+          scheduled.push({
+            ...event,
+            scheduledTime: formatTime(scheduledTime),
+          });
+          occupiedTimes.add(scheduledTime);
         }
 
-        console.log("Final Scheduled Events:", scheduledEvents);
-        setEvents(scheduledEvents);
+        setEvents(scheduled);
+        console.log("Final Scheduled Events:", events);
       })
       .catch((error) => console.error("Error fetching events:", error));
   }, [formattedSelectedDate, userId]);
@@ -176,7 +207,7 @@ const DayPlanner2 = () => {
               ) : event ? (
                 (() => {
                   const eventDateTime = new Date(
-                    `${formattedSelectedDate}T${cleanTime(event.time)}`
+                    `${formattedSelectedDate}T${cleanTime(event.scheduledTime)}`
                   );
                   const isPastEvent = eventDateTime < new Date();
 

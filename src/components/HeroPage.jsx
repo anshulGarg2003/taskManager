@@ -5,14 +5,26 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "../redux/userSlice";
 import { BASIC_URL } from "../utlis/API_calls";
+import toast from "react-hot-toast";
+import { setErrorStatus } from "../redux/error";
 
 const HeroPage = () => {
-  const { user, loginWithRedirect, logout, isAuthenticated } = useAuth0();
+  const { user, loginWithRedirect, logout } = useAuth0();
   const userInfo = useSelector((state) => state.user);
+  const Error = useSelector((state) => state.error);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [grade, setGrade] = useState("");
-  const [school, setSchool] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (Error.isOpen) {
+    toast.error(Error.message);
+    setErrorStatus({ isOpen: false });
+  }
+
+  const handleLogin = () => {
+    setLoading(true);
+    loginWithRedirect();
+  };
 
   useEffect(() => {
     if (user) {
@@ -25,12 +37,15 @@ const HeroPage = () => {
           email: user.email,
           picture: user.picture,
           isPaid: false,
+          role: "student",
         }),
       })
         .then((res) => res.json()) // ✅ Parse JSON response
         .then((data) => {
           console.log(data);
           dispatch(setUserInfo(data));
+          setLoading(false);
+
           navigate("/dashboard"); // Redirect after storing data
         })
         .catch((error) => console.error("Error storing user:", error));
@@ -59,7 +74,7 @@ const HeroPage = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
       >
-        {isAuthenticated ? (
+        {userInfo.id != "" ? (
           <motion.button
             onClick={() => logout({ returnTo: window.location.origin })}
             className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
@@ -70,12 +85,12 @@ const HeroPage = () => {
           </motion.button>
         ) : (
           <motion.button
-            onClick={loginWithRedirect}
+            onClick={handleLogin}
             className="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            Log In
+            {loading ? "Please Wait" : "Log In"}
           </motion.button>
         )}
       </motion.div>

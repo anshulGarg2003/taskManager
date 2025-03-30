@@ -3,10 +3,11 @@ import { NavbarData } from "../data/Navbar";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -43,7 +44,7 @@ const Navbar = () => {
           className="relative flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 hover:bg-purple-600 transition-all shadow-lg hover:shadow-purple-500/50"
         >
           <User className="text-white w-5 h-5" />
-          {isAuthenticated && (
+          {userInfo.id != "" && (
             <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900"></span>
           )}
         </button>

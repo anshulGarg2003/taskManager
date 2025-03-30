@@ -8,6 +8,11 @@ import DayPlanner2 from "./components/DayPlanner";
 import Dashboard from "./components/Dashboard";
 import YearPlanner from "./components/calender";
 import StudyPage from "./components/StudyPage";
+import AdminPage from "./admin/page";
+import AdminRoute from "./components/AdminRoute";
+import AdminUser from "./admin/pages/AdminUser";
+import AdminQuestions from "./admin/pages/AdminQuestions";
+import AdminSettings from "./admin/pages/AdminSettings";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +79,46 @@ const router = createBrowserRouter([
           <StudyPage className="w-full md:w-3/4" />
         </div>
       </div>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminPage />
+      </div>
+      // </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/users",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminUser />
+      </div>
+      // </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/questions",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminQuestions />
+      </div>
+      // </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/settings",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminSettings />
+      </div>
+      // </AdminRoute>
     ),
   },
 ]);

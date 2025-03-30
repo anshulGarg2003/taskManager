@@ -20,6 +20,7 @@ export default function Subjects() {
   const [chapter, setChapter] = useState(null);
   const [school, setSchool] = useState("");
   const [grade, setGrade] = useState(null);
+  const [time, setTime] = useState("");
   const [showForm, setShowForm] = useState(false);
   const dispatch = useDispatch();
 
@@ -79,6 +80,8 @@ export default function Subjects() {
         "You have to purchase our premium servies to avail this feature"
       );
     if (!chapter || !chapter.topics) return toast.error("No chapter selected!");
+    if (time == "") return toast.error("Please select the preferred timing");
+    
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + 1); // Start scheduling from tomorrow
 
@@ -95,7 +98,7 @@ export default function Subjects() {
             ? "medium"
             : "high",
         date: eventDate.toISOString().split("T")[0], // Format YYYY-MM-DD
-        time: "07:00",
+        time: time,
       };
     });
 
@@ -228,7 +231,6 @@ export default function Subjects() {
             </button>
           </div>
         ) : (
-          // Topic Selection with Time and Difficulty
           <div>
             <h2 className="text-xl font-semibold text-gray-800 text-center mb-3 w-full">
               {chapter.chapter} - Topics
@@ -250,12 +252,21 @@ export default function Subjects() {
                 </motion.li>
               ))}
             </ul>
-            <button
-              className="mt-4 bg-gray-700 text-white font-medium p-3 rounded-lg shadow-lg hover:bg-gray-900 transition-all w-full"
-              onClick={() => handleChapterSchedule()}
-            >
-              Schedule the chapter
-            </button>
+            <div className="my-3 gap-3">
+              <input
+                type="text"
+                placeholder="Prefered Time"
+                className="w-full p-2 mb-3 border border-gray-300 rounded-lg text-black"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              <button
+                className=" bg-gray-700 text-white font-medium p-3 rounded-lg shadow-lg hover:bg-gray-900 transition-all w-full"
+                onClick={() => handleChapterSchedule()}
+              >
+                Schedule the chapter
+              </button>
+            </div>
           </div>
         )}
       </motion.div>
