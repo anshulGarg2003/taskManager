@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "../redux/userSlice";
 import { BASIC_URL } from "../utlis/API_calls";
+<<<<<<< HEAD
 import toast from "react-hot-toast";
 import { setErrorStatus } from "../redux/error";
 
@@ -25,6 +26,16 @@ const HeroPage = () => {
     setLoading(true);
     loginWithRedirect();
   };
+=======
+
+const HeroPage = () => {
+  const { user, loginWithRedirect, logout, isAuthenticated } = useAuth0();
+  const userInfo = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [grade, setGrade] = useState("");
+  const [school, setSchool] = useState("");
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
 
   useEffect(() => {
     if (user) {
@@ -37,15 +48,21 @@ const HeroPage = () => {
           email: user.email,
           picture: user.picture,
           isPaid: false,
+<<<<<<< HEAD
           role: "student",
+=======
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
         }),
       })
         .then((res) => res.json()) // ✅ Parse JSON response
         .then((data) => {
           console.log(data);
           dispatch(setUserInfo(data));
+<<<<<<< HEAD
           setLoading(false);
 
+=======
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
           navigate("/dashboard"); // Redirect after storing data
         })
         .catch((error) => console.error("Error storing user:", error));
@@ -74,7 +91,11 @@ const HeroPage = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
       >
+<<<<<<< HEAD
         {userInfo.id != "" ? (
+=======
+        {isAuthenticated ? (
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
           <motion.button
             onClick={() => logout({ returnTo: window.location.origin })}
             className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
@@ -85,12 +106,20 @@ const HeroPage = () => {
           </motion.button>
         ) : (
           <motion.button
+<<<<<<< HEAD
             onClick={handleLogin}
+=======
+            onClick={loginWithRedirect}
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
             className="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
+<<<<<<< HEAD
             {loading ? "Please Wait" : "Log In"}
+=======
+            Log In
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
           </motion.button>
         )}
       </motion.div>

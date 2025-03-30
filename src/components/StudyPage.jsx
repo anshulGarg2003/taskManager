@@ -20,7 +20,10 @@ export default function Subjects() {
   const [chapter, setChapter] = useState(null);
   const [school, setSchool] = useState("");
   const [grade, setGrade] = useState(null);
+<<<<<<< HEAD
   const [time, setTime] = useState("");
+=======
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
   const [showForm, setShowForm] = useState(false);
   const dispatch = useDispatch();
 
@@ -80,8 +83,11 @@ export default function Subjects() {
         "You have to purchase our premium servies to avail this feature"
       );
     if (!chapter || !chapter.topics) return toast.error("No chapter selected!");
+<<<<<<< HEAD
     if (time == "") return toast.error("Please select the preferred timing");
     
+=======
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + 1); // Start scheduling from tomorrow
 
@@ -98,7 +104,11 @@ export default function Subjects() {
             ? "medium"
             : "high",
         date: eventDate.toISOString().split("T")[0], // Format YYYY-MM-DD
+<<<<<<< HEAD
         time: time,
+=======
+        time: "07:00",
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
       };
     });
 
@@ -231,6 +241,10 @@ export default function Subjects() {
             </button>
           </div>
         ) : (
+<<<<<<< HEAD
+=======
+          // Topic Selection with Time and Difficulty
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
           <div>
             <h2 className="text-xl font-semibold text-gray-800 text-center mb-3 w-full">
               {chapter.chapter} - Topics
@@ -252,6 +266,7 @@ export default function Subjects() {
                 </motion.li>
               ))}
             </ul>
+<<<<<<< HEAD
             <div className="my-3 gap-3">
               <input
                 type="text"
@@ -267,6 +282,14 @@ export default function Subjects() {
                 Schedule the chapter
               </button>
             </div>
+=======
+            <button
+              className="mt-4 bg-gray-700 text-white font-medium p-3 rounded-lg shadow-lg hover:bg-gray-900 transition-all w-full"
+              onClick={() => handleChapterSchedule()}
+            >
+              Schedule the chapter
+            </button>
+>>>>>>> 1bbbd2aba495eacb8de4817f2e61da1cacdb6b6f
           </div>
         )}
       </motion.div>
