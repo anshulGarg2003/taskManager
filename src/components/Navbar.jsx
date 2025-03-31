@@ -36,6 +36,18 @@ const Navbar = () => {
               {link.title}
             </NavLink>
           ))}
+          {userInfo.role === "admin" && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-purple-400 font-semibold text-lg transition-all"
+                  : "text-white font-medium text-lg hover:text-purple-300"
+              }
+            >
+              Admin
+            </NavLink>
+          )}
         </div>
 
         {/* Profile Button */}
