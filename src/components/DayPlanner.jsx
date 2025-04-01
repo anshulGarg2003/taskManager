@@ -85,46 +85,6 @@ const DayPlanner2 = () => {
           return a.title.localeCompare(b.title);
         });
 
-        // Step 2: Adjust time slots to avoid conflicts
-        // const scheduledEvents = [];
-        // let earliestHour = mergedEvents.reduce((earliest, event) => {
-        //   let eventHour = parseInt(event.time.split(":")[0]); // Extract the hour part
-        //   return eventHour < earliest ? eventHour : earliest;
-        // }, Infinity);
-
-        // // Convert it to HH:00 format
-        // let lastScheduledTime = `${String(earliestHour).padStart(2, "0")}:00`;
-
-        // console.log(lastScheduledTime);
-
-        // const occupiedSlots = new Set();
-
-        // for (const event of mergedEvents) {
-        //   let [hours, minutes] = lastScheduledTime.split(":").map(Number);
-
-        //   // If time is already occupied, find the next available slot
-        //   while (
-        //     occupiedSlots.has(
-        //       `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-        //         2,
-        //         "0"
-        //       )}`
-        //     )
-        //   ) {
-        //     hours += 1;
-        //   }
-
-        //   // Assign new time
-        //   const newTime = `${String(hours).padStart(2, "0")}:${String(
-        //     minutes
-        //   ).padStart(2, "0")}`;
-        //   occupiedSlots.add(newTime);
-        //   scheduledEvents.push({ ...event, time: newTime });
-
-        //   // Update last scheduled time
-        //   lastScheduledTime = newTime;
-        // }
-
         let scheduled = [];
         let occupiedTimes = new Set();
 

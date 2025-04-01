@@ -83,12 +83,13 @@ export default function Subjects() {
     if (time == "") return toast.error("Please select the preferred timing");
 
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 1); // Start scheduling from tomorrow
+    startDate.setDate(startDate.getDate() + 1);
+    let endDate = new Date();
 
     const subtopics = chapter.topics.map((topic, index) => {
       const eventDate = new Date(startDate);
       eventDate.setDate(startDate.getDate() + index); // Schedule one per day
-
+      endDate = eventDate;
       return {
         name: topic.name,
         difficulty:
@@ -107,6 +108,7 @@ export default function Subjects() {
       subject,
       chapter: chapter.chapter,
       subtopics,
+      completeAt: endDate,
     };
 
     console.log(studyPlan);

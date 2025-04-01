@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/Home";
 import Paste from "./components/Paste";
-import ViewPaste from "./components/ViewPaste";
 import Navbar from "./components/Navbar";
 import HeroPage from "./components/HeroPage";
 import DayPlanner2 from "./components/DayPlanner";
@@ -13,6 +12,7 @@ import AdminRoute from "./components/AdminRoute";
 import AdminUser from "./admin/pages/AdminUser";
 import AdminQuestions from "./admin/pages/AdminQuestions";
 import AdminSettings from "./admin/pages/AdminSettings";
+import AddChapter from "./admin/pages/AddChapter";
 
 const router = createBrowserRouter([
   {
@@ -39,15 +39,6 @@ const router = createBrowserRouter([
       <div className="w-full h-full flex flex-col">
         <Navbar />
         <Paste />
-      </div>
-    ),
-  },
-  {
-    path: "/pastes/:id",
-    element: (
-      <div className="w-full h-full flex flex-col">
-        <Navbar />
-        <ViewPaste />
       </div>
     ),
   },
@@ -84,11 +75,9 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      // <AdminRoute>
       <div className="w-full h-full flex flex-col">
         <AdminPage />
       </div>
-      // </AdminRoute>
     ),
   },
   {
@@ -112,11 +101,11 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/settings",
+    path: "/admin/addchapter",
     element: (
       // <AdminRoute>
       <div className="w-full h-full flex flex-col">
-        <AdminSettings />
+        <AddChapter />
       </div>
       // </AdminRoute>
     ),

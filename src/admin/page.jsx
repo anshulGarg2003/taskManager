@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { ArrowLeftCircleIcon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Typewriter from "typewriter-effect";
 
@@ -46,11 +47,21 @@ export default function AdminPage() {
           className={`bg-pink-600 hover:brightness-125 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-lg hover:scale-105`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => navigate("/admin/settings")}
+          onClick={() => navigate("/admin/addchapter")}
         >
-          Settings
+          Add Chapter
         </motion.button>
       </motion.div>
+
+      <motion.button
+        className="mt-10 flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-400 hover:brightness-125 px-6 py-3 rounded-full text-lg font-semibold transition-all shadow-xl hover:scale-105 text-white"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => navigate("/dashboard")}
+      >
+        <ArrowLeftCircleIcon className="w-6 h-6" />
+        Back to Dashboard
+      </motion.button>
     </div>
   );
 }
