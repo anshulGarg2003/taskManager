@@ -42,7 +42,7 @@ const HeroPage = () => {
       })
         .then((res) => res.json()) // ✅ Parse JSON response
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           dispatch(setUserInfo(data));
           setLoading(false);
 
@@ -52,7 +52,7 @@ const HeroPage = () => {
     }
   }, [user, userInfo, dispatch, navigate]);
 
-  console.log(userInfo);
+  // console.log(userInfo);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white">

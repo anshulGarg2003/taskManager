@@ -1,4 +1,4 @@
-import { User, Menu } from "lucide-react";
+import { User, Menu, X } from "lucide-react";
 import { NavbarData } from "../data/Navbar";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const Navbar = () => {
   const navigate = useNavigate();
   const userInfo = useSelector((state) => state.user);
-  console.log(userInfo);
+  // console.log(userInfo);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDashboard = () => {
@@ -25,7 +25,7 @@ const Navbar = () => {
       <div className="flex justify-between items-center max-w-6xl mx-auto px-4">
         {/* Hamburger Menu (Mobile) */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(true)}
           className="md:hidden text-white"
         >
           <Menu className="w-8 h-8" />
@@ -62,25 +62,31 @@ const Navbar = () => {
 
         {/* Profile Button */}
         <button
-          onClick={() => handleDashboard()}
+          onClick={handleDashboard}
           className="relative flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 hover:bg-purple-600 transition-all shadow-lg hover:shadow-purple-500/50"
         >
           <User className="text-white w-5 h-5" />
-          {userInfo.id != "" && (
+          {userInfo.id && (
             <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900"></span>
           )}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Full-Screen Mobile Menu */}
       {isOpen && (
-        <div className="flex flex-col md:hidden bg-gray-800 p-4 gap-y-4">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center gap-y-6 z-50">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-6 right-6 text-white"
+          >
+            <X className="w-8 h-8" />
+          </button>
           {NavbarData.map((link, idx) => (
             <NavLink
               key={idx}
               to={link.path}
               onClick={() => setIsOpen(false)}
-              className="text-white text-lg hover:text-purple-300"
+              className="text-white text-2xl hover:text-purple-300"
             >
               {link.title}
             </NavLink>
@@ -88,11 +94,8 @@ const Navbar = () => {
           {userInfo.role === "admin" && (
             <NavLink
               to="/admin"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-purple-400 font-semibold text-lg transition-all"
-                  : "text-white font-medium text-lg hover:text-purple-300"
-              }
+              onClick={() => setIsOpen(false)}
+              className="text-white text-2xl hover:text-purple-300"
             >
               Admin
             </NavLink>

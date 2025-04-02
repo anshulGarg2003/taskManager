@@ -14,7 +14,7 @@ const subjects = [
 
 const AddChapter = () => {
   const [loading, setLoading] = useState(false);
-  const [subject, setsubject] = useState(subjects[0]);
+  const [selectedSubject, setSelectedSubject] = useState(subjects[0]);
   const [grade, setGrade] = useState("");
   const [overallDifficulty, setOverallDifficulty] = useState("");
   const [chapter, setChapter] = useState("");
@@ -29,7 +29,7 @@ const AddChapter = () => {
   }, []);
 
   const handleReset = () => {
-    setsubject(subjects[0]);
+    setSelectedSubject(subjects[0]);
     setOverallDifficulty("");
     setChapter("");
     setGrade("");
@@ -62,9 +62,9 @@ const AddChapter = () => {
   };
 
   const handleSubmit = async () => {
-    console.log(subject, chapter, subtopics);
+    console.log(selectedSubject, chapter, subtopics);
 
-    if (!subject) {
+    if (!selectedSubject) {
       toast.error("Please select subject");
       return;
     }
@@ -86,16 +86,17 @@ const AddChapter = () => {
     const chapterData = {
       chapter,
       grade,
-      subject: subject.name,
       overallDifficulty: overallDifficulty,
       subtopics,
     };
+    let url = "";
+    if (selectedSubject.name === "Maths")
+      url = `${BASIC_URL}/api/maths/add-chapter`;
+    else if (selectedSubject.name === "Physics")
+      url = `${BASIC_URL}/api/physics/add-chapter`;
 
     try {
-      const response = await axios.post(
-        `${BASIC_URL}/api/maths/add-chapter`,
-        chapterData
-      );
+      await axios.post(url, chapterData);
       //   console.log("Chapter added:", response.data);
       toast.success("Chapter added successfully!");
       handleReset();
@@ -131,7 +132,7 @@ const AddChapter = () => {
       initial={{ opacity: 0, y: 0 }}
       animate={{ opacity: fadeIn ? 1 : 0, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className={`min-h-screen p-6 transition-all duration-500 ${subject.color} text-white`}
+      className={`min-h-screen p-6 transition-all duration-500 ${selectedSubject.color} text-white`}
     >
       {/* Back to Admin Dashboard Button */}
       <motion.button
@@ -148,9 +149,10 @@ const AddChapter = () => {
         {subjects.map((subject) => (
           <motion.button
             key={subject.name}
-            onClick={() => setsubject(subject)}
+            onClick={() => setSelectedSubject(subject)}
             className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              subject.name === subject.name ? "bg-yellow-500" : "bg-gray-700"
+              subject.name === selectedSubject.name && "bg-red-700"
+            }
             }`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -168,7 +170,7 @@ const AddChapter = () => {
         transition={{ delay: 0.5, duration: 0.5 }}
       >
         <h2 className="text-2xl font-bold mb-4 text-center">
-          Add a Chapter to {subject.name}
+          Add a Chapter to {selectedSubject.name}
         </h2>
 
         <motion.div>
@@ -192,6 +194,9 @@ const AddChapter = () => {
               onChange={(e) => setGrade(e.target.value)}
               className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-yellow-500"
             >
+              <option value="" disabled selected>
+                Select Grade
+              </option>
               <option value="11th">11th</option>
               <option value="12th">12th</option>
             </select>
