@@ -1,13 +1,18 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/Home";
 import Paste from "./components/Paste";
-import ViewPaste from "./components/ViewPaste";
 import Navbar from "./components/Navbar";
 import HeroPage from "./components/HeroPage";
 import DayPlanner2 from "./components/DayPlanner";
 import Dashboard from "./components/Dashboard";
 import YearPlanner from "./components/calender";
 import StudyPage from "./components/StudyPage";
+import AdminPage from "./admin/page";
+import AdminRoute from "./components/AdminRoute";
+import AdminUser from "./admin/pages/AdminUser";
+import AdminQuestions from "./admin/pages/AdminQuestions";
+import AdminSettings from "./admin/pages/AdminSettings";
+import AddChapter from "./admin/pages/AddChapter";
 
 const router = createBrowserRouter([
   {
@@ -34,15 +39,6 @@ const router = createBrowserRouter([
       <div className="w-full h-full flex flex-col">
         <Navbar />
         <Paste />
-      </div>
-    ),
-  },
-  {
-    path: "/pastes/:id",
-    element: (
-      <div className="w-full h-full flex flex-col">
-        <Navbar />
-        <ViewPaste />
       </div>
     ),
   },
@@ -74,6 +70,44 @@ const router = createBrowserRouter([
           <StudyPage className="w-full md:w-3/4" />
         </div>
       </div>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <div className="w-full h-full flex flex-col">
+        <AdminPage />
+      </div>
+    ),
+  },
+  {
+    path: "/admin/users",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminUser />
+      </div>
+      // </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/questions",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AdminQuestions />
+      </div>
+      // </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/addchapter",
+    element: (
+      // <AdminRoute>
+      <div className="w-full h-full flex flex-col">
+        <AddChapter />
+      </div>
+      // </AdminRoute>
     ),
   },
 ]);
